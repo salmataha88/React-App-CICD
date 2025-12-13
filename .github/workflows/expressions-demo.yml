@@ -37,9 +37,9 @@ jobs:
         run: |
           echo "${{ format('Image tag: {0}:{1}', github.repository, github.sha) }}"
 
-      - name: success() example
-        if: success()
-        run: echo "All previous steps succeeded ✅"
+      - name: failure() example
+        if: failure()
+        run: echo " The previous step failed 😞"
 
       - name: always() example
         if: always()
