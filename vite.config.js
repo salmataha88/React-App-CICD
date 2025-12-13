@@ -6,6 +6,7 @@ export default defineConfig({
   build: {
     outDir: "dist"
   },
+  base: "/React-App-CICD/",
   test: {
     globals: true,        // allow using expect/test/describe without imports
     environment: "jsdom", // required for React components
