@@ -1,14 +1,9 @@
-name: EC2-CICD-pages
+name: REACT-CICD-Artifacts
 
 on:
-  workflow_dispatch:
   push:
     branches: [ "main" ]
 
-permissions:
-  pages: write
-  id-token: write
-  contents: write
 
 
 jobs:
@@ -30,24 +25,34 @@ jobs:
       run: npm run build
  
     - name: upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: github-pages
+        name: react-app-build
         path: dist/
     
 
 
-  deploy:    
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-        - name: Download build artifacts
-          uses: actions/download-artifact@v4
+  deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+        - name: download build artifacts
+          uses: actions/download-artifact@v3
           with:
-            name: github-pages
-        - name: Setup Pages
-          uses: actions/configure-pages@v5
-
-        - name: Deploy to GitHub Pages
-          uses: actions/deploy-pages@v4
-
+            name: react-app-build
+        - name: Copy artifact to server
+          uses: appleboy/scp-action@v1
+          with:
+            host: ${{ vars.SSH_HOST }}
+            username: ${{ vars.SSH_USER }}
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            source: ./*
+            target: /usr/share/nginx/html/        
+        - name: SSH into server
+          uses: appleboy/ssh-action@v1.0.3
+          with:
+            host: ${{ vars.SSH_HOST }}
+            username: ${{ vars.SSH_USER }}
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            script: |
+                sudo systemctl restart nginx
