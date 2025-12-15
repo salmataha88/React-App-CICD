@@ -1,9 +1,9 @@
 name: REACT-CICD-Artifacts
 
 on:
-  # push:
-  #   branches: [ "main" ]
-  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  # workflow_dispatch:
 
 
 jobs:
@@ -32,28 +32,28 @@ jobs:
     
 
 
-  # deploy:
-  #       needs: build
-  #       runs-on: ubuntu-latest
-  #       steps:
-  #       - name: download build artifacts
-  #         uses: actions/download-artifact@v4
-  #         with:
-  #           name: react-app-build
-  #       - name: Copy artifact to server
-  #         uses: appleboy/scp-action@v1
-  #         with:
-  #           host: ${{ vars.SSH_HOST }}
-  #           username: ${{ vars.SSH_USER }}
-  #           key: ${{ secrets.SSH_PRIVATE_KEY }}
-  #           source: ./*
-  #           target: /usr/share/nginx/html/
-  #           rm: true        
-  #       - name: SSH into server
-  #         uses: appleboy/ssh-action@v1.0.3
-  #         with:
-  #           host: ${{ vars.SSH_HOST }}
-  #           username: ${{ vars.SSH_USER }}
-  #           key: ${{ secrets.SSH_PRIVATE_KEY }}
-  #           script: |
-  #               sudo systemctl restart nginx
+  deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+        - name: download build artifacts
+          uses: actions/download-artifact@v4
+          with:
+            name: react-app-build
+        - name: Copy artifact to server
+          uses: appleboy/scp-action@v1
+          with:
+            host: ${{ vars.SSH_HOST }}
+            username: ${{ vars.SSH_USER }}
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            source: ./*
+            target: /usr/share/nginx/html/
+            rm: true        
+        - name: SSH into server
+          uses: appleboy/ssh-action@v1.0.3
+          with:
+            host: ${{ vars.SSH_HOST }}
+            username: ${{ vars.SSH_USER }}
+            key: ${{ secrets.SSH_PRIVATE_KEY }}
+            script: |
+                sudo systemctl restart nginx
