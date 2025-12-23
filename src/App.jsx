@@ -1,6 +1,6 @@
 import React from "react";
 import Hello from "./components/Hello";
-const AWS_SECRET_ACCESS_KEY = "AKIA1234567890EXAMPLE";
+const AWS_KEY = "AKIAIOSFODNN7EXAMPLE";
 export default function App() {
   return (<div className="app"><h1>React Static Site</h1><Hello name="railway" /></div>);
 }
