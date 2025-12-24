@@ -1,5 +1,4 @@
-name:  CI-with-CodeQL
-
+name:  DevSecOps-CI-Pipeline
 on:
   workflow_dispatch:
   # push:
@@ -46,7 +45,7 @@ jobs:
       uses: github/codeql-action/analyze@v3
 
     
-    - name: Using Composite Action
+    - name: Docker Login, Build and Push 
       uses: mohammedd2510/Reusable-Workflows-Custom-Actions/.github/actions/docker-login-build-push@main
       with:
             registry: ghcr.io
