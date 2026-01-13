@@ -1,0 +1,70 @@
+name: Multi-Environment Deployment Pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        type: choice
+        options:
+          - production
+          - staging
+
+permissions:
+    packages: write
+
+jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Set up Node.js 20
+          uses: actions/setup-node@v6
+          with:
+            node-version: '20'
+
+        - name: Install dependencies
+          run: npm install
+
+        - name: Lint code
+          run: npm run lint
+
+        - name: Run tests
+          run: npm run test
+
+        - name: Build project
+          run: npm run build
+
+        - name: Log in to GitHub Container Registry
+          uses: docker/login-action@v2
+          with:
+            registry: ghcr.io
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+        
+        - name: Build and push Docker image
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            push: true
+            tags: |
+              ghcr.io/${{ github.actor }}/react-app-cicd:${{ github.sha }}
+              ghcr.io/${{ github.actor }}/react-app-cicd:latest
+
+    deploy-prod:
+      runs-on: ubuntu-latest
+      needs: build
+      if: github.event.inputs.environment == 'production'
+      steps:
+       - name: Deploy to Production
+         run: echo "Deploying to production server"
+  
+    deploy-staging:
+      runs-on: ubuntu-latest
+      needs: build
+      if: github.event.inputs.environment == 'staging'
+      steps:
+       - name: Deploy to Staging
+         run: echo "Deploying to staging server"
