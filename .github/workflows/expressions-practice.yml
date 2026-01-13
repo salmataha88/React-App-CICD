@@ -1,0 +1,62 @@
+name: Expressions Practice
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment name'
+        required: false
+        default: 'dev'
+
+jobs:
+  practice:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Branch Check
+        run: |
+          if [[ "${{ startsWith(github.ref, 'refs/heads/main') }}" == "true" ]]; then
+            echo "Main branch"
+          else
+            echo "Other branch"
+          fi
+      
+      - name: Commit Message Check
+        if: contains(github.event.head_commit.message, 'fix')
+        run: |
+          echo "Commit message: ${{ github.event.head_commit.message }}"
+      
+      - name: Show Event Data
+        run: |
+          echo 'Event payload:'
+          echo '${{ toJSON(github.event) }}'
+      
+      - name: Environment Value
+        run: |
+          echo "Selected environment: ${{ github.event.inputs.environment || 'dev' }}"
+      
+      - name: Test Step
+        id: test_step
+        continue-on-error: true
+        run: |
+          echo "Running test..."
+          # Uncomment to simulate failure:
+          # exit 1
+      
+      - name: On Success
+        if: success()
+        run: echo "✅ All previous steps succeeded"
+      
+      - name: On Failure
+        if: failure()
+        run: echo "❌ A previous step failed"
+      
+      - name: Always Run
+        if: always()
+        run: echo "🧹 Cleanup - this always runs"
+      
+      - name: On Cancelled
+        if: cancelled()
+        run: echo "⚠️ Workflow was cancelled"
